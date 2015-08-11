@@ -1,0 +1,60 @@
+var diagramSpec = JSON.parse(	'{"diagram":{'+
+										'"type":"bar",'+
+										'"datasets":[],'+
+										'"highcharts":{'+
+										    	'"chart":{"type":"bar"},'+
+										    	'"title":{"text": "Conversations"},'+
+										    	'"subtitle":{"text":"Last year"},'+
+										    	'"xAxis":{"categories":["Mar \'15","Feb \'15","Jan \'15","Dec \'14","Nov \'14","Oct \'14","Sep \'14","Aug \'14","Jul \'14","Jun \'14","May \'14","Apr \'14"]},'+
+										    	'"yAxis":[{"title":"none","opposite": true}],'+
+										    	'"plotOptions":{'+
+										    		'"column":{'+
+										    			'"grouping":false,'+
+										    			'"shadow":false,'+
+										    			'"borderWidth":0}'+
+										    	'},'+
+										    	'"legend":{'+
+										    		'"layout":"vertical",'+
+										    		'"align":"right",'+
+										    		'"verticalAlign":"middle",'+
+										    		'"floating": true'+
+										    	'},'+
+										    	'"series":[{'+
+										    		'"name":"Family",'+
+										    		'"color":"#fdbca3",'+
+										    		'"data":[150,73,20,143,135,93,102,45,32,87,150,145],'+
+										    		'"pointPadding":-0.7 ,'+
+										    		'"pointPlacement":0.6'+
+										    	'}, {'+
+										    		'"name":"Family in person",'+
+										    		'"color":"#fd885c",'+
+										    		'"data":[135,43,7,93,135,87,100,15,12,17,143,136],'+
+										    		'"pointPadding":-0.3,'+
+										    		'"pointPlacement":0.5'+
+										    	'}, {'+
+										    		'"name":"Friends",'+
+										    		'"color":"#70dbc8",'+
+										    		'"data":[236,287,200,17,135,143,117,193,193,235,115,112],'+
+										    		'"pointPadding":-0.7,'+
+										    		'"pointPlacement":0.1'+
+										    	'}, {'+
+										    		'"name":"Friends in person",'+
+										    		'"color":"#1db095",'+
+										    		'"data":[206,167,90,2,35,43,67,133,113,35,75,92],'+
+										    		'"pointPadding":-0.3,'+
+										    		'"pointPlacement":0'+
+										    	'}, {'+
+										    		'"name":"Others",'+
+										    		'"color":"#f3d8f3",'+
+										    		'"data":[35,72,50,23,10,43,50,45,63,35,22,87],'+
+										    		'"pointPadding":-0.6,'+
+										    		'"pointPlacement":0.6'+
+										    	'}, {'+
+										    		'"name":"Others in person",'+
+										    		'"color":"#e8a9e7",'+
+										    		'"data":[30,68,47,16,9,36,47,35,53,45,12,79],'+
+										    		'"pointPadding":-0.3,'+
+										    		'"pointPlacement":0.5'+
+										    	'}]'+
+										    '}'+
+									'}}');

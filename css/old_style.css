@@ -1,0 +1,442 @@
+/* reset body padding and margin */
+body
+{
+	padding: 0;
+	margin: 0;
+	background-color: #FFF;
+}
+
+
+/* the entire full width banner */
+#app_header
+{
+	display: block;
+	background-color: #1db095; /* Dark Cyan */
+	width: 100%;
+	height: 60px;
+	position: relative;
+	-moz-box-shadow: 0 4px 4px -4px gray;
+	-webkit-box-shadow: 0 4px 4px -4px gray;
+	box-shadow: 0 4px 4px -4px gray;
+}
+
+/* the centred header banner */
+#logo_banner
+{	
+	display: inline-block;
+	background-color: #1db095; /* Dark Cyan */
+	text-align: center;
+	color: #FFF; 				/* White */
+	width: 420px;
+	height: 60px;
+	position: absolute;
+	margin: 0 0 0 -210px;
+	left: 50%;
+}
+
+/* the small logo on the left of the banner */
+#header_logo_left
+{
+	display: inline-block;
+	float: left;
+	width: 58px;
+	height: 58px;
+	margin: 1px 4px 1px 4px;
+}
+
+
+
+
+
+/* ======================================== styling the divs that display information for each page for the user */
+			.styleInfoDiv
+			{
+				width: 380px;
+				height: 150px;
+				font: 25px Georgia, serif;
+				background-color: #e5e5da;
+				padding: 10px;
+				margin-bottom: 10px;
+				-webkit-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16), 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+				-moz-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16), 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+				box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16), 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+			}
+
+
+			/* the picture container inside info div */
+			.info-pic-container
+			{
+				float: left;
+				margin: 10px;
+			}
+
+			/* the img itself inside the infodiv */
+			.info-pic-container img
+			{
+				width: 100px;
+			}
+
+			/* the message container inside info div */
+			.info-msg-container
+			{
+				padding: 5px;
+			}
+
+/* ============================================================================================================= END */
+
+
+
+
+
+/* drops an element 50% of height to centre vertically */
+.vertDrop
+{
+	position: relative;
+	top: 50%;
+	-webkit-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+}
+
+/* the menu icon */
+#filler
+{
+	cursor: pointer;	
+}
+
+/* the small logo on the right of the banner */
+#header_logo_right_container
+{
+	display: inline-block;
+	text-align: center;
+	float: right;
+	width: 48px;
+	height: 48px;
+}
+
+/* the logo text */
+#logo_banner h1
+{
+	font: 48px/60px Georgia, serif;
+	display: inline-block;
+	margin: 0 30px 0 10px;
+}
+
+/* the full width and height white space of the body */
+#false_wrapper
+{
+	background-color: #FFF;
+	height: 100%;
+}
+
+
+/* the centred app container */
+#app_wrapper
+{	
+	display: block;
+	background-color: #FFF; /* White */
+	font: 24px Georgia, serif;
+	color: #000; 			/* Black */
+	width: 400px;
+	height: 680px;
+	position: absolute;
+	padding: 10px;
+	margin: 0 0 0 -210px;
+	left: 50%;
+	z-index: -1;
+}
+
+/* styling the settings */
+.settings_input
+{
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	border-radius: 0;
+    -webkit-border-radius:0; 
+	-moz-border-radius: 0;
+	font: 25px Helvetica, sans-serif;
+    border: none;
+	width: 200px;
+	height: 28px;
+    padding: 10px;
+	margin: auto;
+	margin-top: 20px;
+	margin-bottom: 20px;
+    background: #e5e5da;
+	position: relative;
+}
+
+/* =================================== styling the settings container */
+			#settings_container
+			{
+				margin-top: 70px;
+			}
+
+
+			#settings_list
+			{
+				padding-top: 20px;
+				width: 350px;
+				margin: auto;
+				background-color: rgba(229,229,218, 0.5);
+				text-align: center;
+				clear: both;
+			}
+
+			.settings_checklist
+			{
+				padding-bottom: 20px;
+
+			}
+
+
+			.settings_input
+			{
+				margin-bottom: 50px;
+			}
+
+			.settings_submit
+			{
+				appearance: none;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				-webkit-border-radius:0; 
+				border-radius:0;
+				background-color: #fd885c; /*Soft Orange*/
+				font: 25px Georgia, serif;
+				border: none;
+				padding: 5px 10.5px 5px 10.5px;
+				margin-bottom: 20px;
+				cursor: pointer;
+			}
+/* =========================================================== END */
+
+
+/* drop the charts down to keave room for info div*/
+.styleChartDiv
+{
+	margin-top: 30px;
+}
+
+/* the logo in the body */
+.body_logo
+{
+	
+	width: 360px;
+	height: 90px;
+	display: block;
+	margin: 80px auto;
+	-webkit-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16), 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+	-moz-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16), 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+	box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16), 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+}
+
+
+/* =============================================== styling the forms and buttons */
+
+			/* the form div */
+			#login_form
+			{
+				width: 360px;
+				height: 400px;
+				margin: auto;
+				padding: 10px;
+				position: relative;
+			}
+
+			/* the form */
+			#login_form form
+			{
+				height: 240px;
+			}
+
+			/* the text input areas */
+			.form_text
+			{
+				appearance: none;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				
+				border-radius: 0;
+				-webkit-border-radius:0; 
+				-moz-border-radius: 0;
+				
+				font: 25px Helvetica, sans-serif;
+				border: none;
+				width: 340px;
+				height: 28px;
+				padding: 10px;
+				background: #e5e5da; /* grey */
+				margin: 10px 0 10px 0;
+			}
+
+			/* outline thick on focus */
+			.form_text:focus 
+			{
+				outline: #e8a9e7 solid thick; /* Magenta */
+			}
+
+			/* the outline medium on hover */
+			.form_text:hover 
+			{
+				outline: #ff9c76 solid medium; /* Light Orange */
+			}
+
+			/* the login button */
+			#login
+			{
+				appearance: none;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				
+				-webkit-border-radius:0; 
+				border-radius:0;
+				background-color: #fd885c; /*Soft Orange*/
+				font: 25px Georgia, serif;
+				border: none;
+				position: absolute;
+				left: 50%;
+				padding: 5px 10.5px 5px 10.5px;
+				margin: 70px 0 40px -42px;
+				cursor: pointer;
+			}
+
+			/* outline on hover */
+			#login:hover
+			{
+				appearance: none;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				background-color: #ff9c76;  /* Light Orange */
+				outline: #ff9c76 solid medium; /* Light Orange */
+			}
+
+			/* outline thin on focus */
+			#login:focus
+			{
+				appearance: none;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				background-color: #ff9c76;  /* Light Orange */
+				outline: #e8a9e7 solid thin; /* Magenta */
+			}
+			
+			/* large customise button for recently charts */
+			#recentlyCustomise
+			{
+				width: 100%;
+			}
+			
+			/* general UI buttons */
+			.uiButton
+			{
+				appearance: none;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				
+				-webkit-border-radius:0; 
+				border-radius:0;
+				background-color: #fd885c; /*Soft Orange*/
+				font: 30px Georgia, serif;
+				border: none;
+				padding: 5px 10.5px 5px 10.5px;
+				
+				height: 60px;
+				margin-top: 10px;
+				cursor: pointer;
+			}
+
+			/* outline on hover */
+			.uiButton:hover
+			{
+				appearance: none;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				background-color: #ff9c76;  /* Light Orange */
+				outline: #ff9c76 solid medium; /* Light Orange */
+			}
+
+			/* outline thin on focus */
+			.uiButton:focus
+			{
+				appearance: none;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				background-color: #ff9c76;  /* Light Orange */
+				outline: #ff9c76 solid medium; /* Light Orange */
+			}
+			
+			/* div of table of buttons */
+			#insightsCustom
+			{
+
+				background-color: #fd885c; /*Soft Orange*/
+
+			}
+			/* table of buttons */
+			#insightsCustom table
+			{
+				margin: auto;
+				background-color: #fd885c; /*Soft Orange*/
+			}
+
+			#insightsCustom td
+			{
+				width: 175px;
+				text-align: center;
+
+			}
+
+			/* buttons beneath insight charts */
+			.switchCharts
+			{
+				font: 24px Georgia, serif;
+				width: 60px;
+				margin-top: 2px;
+			}
+
+			.currentChart
+			{	
+				appearance: none;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				background-color: #ff9c76;  /* Light Orange */
+				outline: #ff9c76 solid medium; /* Light Orange */
+			}
+/* ============================================================================== END */
+
+
+
+
+/* google map canvas size */
+#map-canvas{
+		width: 400px;
+		height: 400px;
+		margin: auto;
+		margin-top: 30px;
+	  
+	  } 
+
+
+/* Fade in animation */	  
+.crazyFader
+{
+	-webkit-animation-name: crazyFade;
+	animation-name: crazyFade;
+	-webkit-animation-duration: 1.5s;
+	animation-duration: 1.5s;
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+
+}
+
+@-webkit-keyframes crazyFade { from { opacity:0; } to { opacity:1; } }
+@-moz-keyframes crazyFade { from { opacity:0; } to { opacity:1; } }
+@keyframes crazyFade { from { opacity:0; } to { opacity:1; } }
+
+
+
+
+
+

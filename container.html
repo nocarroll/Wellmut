@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,height=device-height,initial-scale=0.77, user-scalable=no, width=320"/>
+	<link rel="icon" type="image/png" href="images/favicon.png" />
+	<link rel="stylesheet" href="css/style.css"/>
+	<link rel="stylesheet" href="css/notify-costum-style.css"/>
+	
+	<script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
+	<script type="text/javascript" src="js/highcharts.js"></script>
+	<script type="text/javascript" src="js/DBAccess.js"></script>
+	<script type="text/javascript" src="js/notify.min.js"></script>
+	<script type="text/javascript" src="js/notify-costum-layout.js"></script>
+	<script type="text/javascript" src="js/maps.js"></script>
+	
+	<title>Wellmut | Container</title>
+</head>
+
+
+<body>
+
+	<header id="app_header">
+	
+		<div id="logo_banner">
+		
+			<img src="images/ic_header_wellmut.png"  id="header_logo_left" width="36" height="36" alt="The logo for the app">
+			
+			<div class="vertDrop" id="header_logo_right_container">
+				<img class="vertDrop" id="filler" src="images/ic_action_overflow.png" width="30" height="30" alt="The logo for the app" onclick="openNav()">
+			</div>
+			
+			<h1 id="header_title">Container</h1>
+			
+			
+		</div>
+		
+		
+		
+	</header>
+	
+	
+	<div id="false_wrapper">
+	
+		<div id="app_wrapper" class="crazyFader">
+			
+		</div>
+		
+	</div>
+	<p hidden class='location'><span id='locoList'>[]</span></p>
+	<script>
+
+		//========================= START: FUNCTIONS AND GLOBAL VARIABLES ===================
+	
+		var questionOpen = false;
+		var currentInsightsChartNum = 4;
+		var navOpen = false;	
+		var goodMoodSleepAlreadyTold = false;
+		var badMoodSleepAlreadyTold = false;
+		var goodsleepthreshold = 7;
+		
+		
+		//======= FUNCTIONS FOR FINDING PATTERNS IN USER DATA =======
+		
+		//looks up database for sleep
+		function findSleepEntries(){
+			var sleepEntries = []
+			for (i=0; i < DATA.length; i++){
+				if (JSON.parse(DATA[i][3]).name == "sleep"){
+					sleepEntries.push(DATA[i]);
+				}
+			}
+			return sleepEntries
+		}
+		
+		//looks up database for mood
+		function findMoodEntries(){
+			var moodEntries = []
+			for (i=0; i < DATA.length; i++){
+				if (JSON.parse(DATA[i][3]).name == "mood"){
+					moodEntries.push(DATA[i]);
+				}
+			}
+			return moodEntries
+		}
+		
+		//checks if SLEEP has been GOOD. The threshold can be customised by the user in settings
+		function checkSleepGood(){
+			var goodSleep = false;
+			sleepEntries = findSleepEntries();
+			var sleepLen = sleepEntries.length;
+			if (JSON.parse(sleepEntries[sleepLen-1][3]).value >= goodsleepthreshold && JSON.parse(sleepEntries[sleepLen-2][3]).value >= goodsleepthreshold && JSON.parse(sleepEntries[sleepLen-3][3]).value >= goodsleepthreshold){
+				return true
+			}
+			else{
+				return false
+				}
+		}
+		
+		//checks if SLEEP has been BAD. The threshold can be customised by the user in settings
+		function checkSleepBad(){
+			var goodSleep = false;
+			sleepEntries = findSleepEntries();
+			var sleepLen = sleepEntries.length;
+			if (JSON.parse(sleepEntries[sleepLen-1][3]).value < goodsleepthreshold && JSON.parse(sleepEntries[sleepLen-2][3]).value < goodsleepthreshold && JSON.parse(sleepEntries[sleepLen-3][3]).value < goodsleepthreshold){
+				return true
+			}
+			else{
+				return false
+				}
+		}
+		
+		//checks if MOOD has been GOOD. The threshold can be customised by the user in settings
+		function checkMoodGood(){
+			var goodMood = false;
+			moodEntries = findMoodEntries();
+			var moodLen = moodEntries.length;
+			if (JSON.parse(moodEntries[moodLen-1][3]).value > 3 && JSON.parse(moodEntries[moodLen-2][3]).value > 3 && JSON.parse(moodEntries[moodLen-3][3]).value > 3){
+				return true
+			}
+			else{
+				return false
+				}
+		}
+		
+		//checks if MOOD has been BAD. The threshold can be customised by the user in settings
+		function checkMoodBad(){
+			var goodMood = false;
+			moodEntries = findMoodEntries();
+			var moodLen = moodEntries.length;
+			if (JSON.parse(moodEntries[moodLen-1][3]).value < 3 && JSON.parse(moodEntries[moodLen-2][3]).value < 3 && JSON.parse(moodEntries[moodLen-3][3]).value < 3){
+				return true
+			}
+			else{
+				return false
+				}
+		}
+			
+			
+		//compares the information found in database for POSITIVE result
+		function checkMoodAndSleepGood(){
+			var mood = checkMoodGood();
+			var sleep = checkSleepGood();
+			if (mood == true && sleep == true && goodMoodSleepAlreadyTold == false){
+				goodMoodSleepAlreadyTold = true;
+				return true}
+			else {
+				if (mood == false || sleep == false){
+					goodMoodSleepAlreadyTold = false;
+				}
+				return false}
+		}
+		
+		//compares the information found in database for NEGATIVE result
+		function checkMoodAndSleepBad(){
+			var mood = checkMoodBad();
+			var sleep = checkSleepBad();
+			if (mood == true && sleep == true && badMoodSleepAlreadyTold == false){
+				badMoodSleepAlreadyTold = true;
+				return true}
+			else {
+				if (mood == false || sleep == false){
+					badMoodSleepAlreadyTold = false;
+				}
+				return false}
+		}
+		
+		
+		
+		//======= FUNCTIONS FOR NOTIFYING PATTERNS IN USER DATA =======
+		
+		//uses notify.js to alert trends and motivate user
+		function notifyTrends(){
+		if (checkMoodAndSleepGood() == true){
+		
+		var form =	"<form>" +
+								
+								"<br/><input type='button'  id='submitTrends' value='Ok' />" +
+							"</form>";
+							
+		var pic = "<div class='pic-container'>" +
+								"<img id='sliderImage' class='wellmut-pic' src='images/doggy_happy_small.png'/>" +
+							"</div>";
+							
+		$('#header_logo_left').notify({
+							question: 'You\'ve been sleeping well and feeling well lately. Keep it up!',
+							form: form,
+							pic: pic
+						},{				
+							autoHide:false,
+							clickToHide:false,
+							style: 'wellmutNotification',
+							arrowShow: false,
+						});
+						
+		$(document).on('click', '.notifyjs-wellmutNotification-base #submitTrends', function() {  
+				
+				  $(this).trigger('notify-hide');
+		
+				})
+			}
+		if (checkMoodAndSleepBad() == true){
+		
+		var form =	"<form>" +
+								
+								"<br/><input type='button'  id='submitTrends' value='Ok' />" +
+							"</form>";
+							
+		var pic = "<div class='pic-container'>" +
+								"<img id='sliderImage' class='wellmut-pic' src='images/doggy_sad_small.png'/>" +
+							"</div>";
+							
+		$('#header_logo_left').notify({
+							question: 'You haven\'t been sleeping well or feeling well lately. Maybe you should get more sleep!',
+							form: form,
+							pic: pic
+						},{				
+							autoHide:false,
+							clickToHide:false,
+							style: 'wellmutNotification',
+							arrowShow: false,
+						});
+						
+		$(document).on('click', '.notifyjs-wellmutNotification-base #submitTrends', function() {  
+				
+				  $(this).trigger('notify-hide');
+		
+				})
+			}
+		
+		
+		}
+		
+		
+		//======= FUNCTIONS FOR TRACKING AND MAPPING =======
+		
+		//functions for selecting correct mood marker IMAGE for map
+		function getImageForMap(aNumber){
+			var theImage;
+			
+			if (aNumber == 1){
+				theImage = 'map_verysad.png';
+			}
+			else if (aNumber == 2){
+				theImage = 'map_sad.png';
+			}
+			else if (aNumber == 3){
+				theImage = 'map_neutral.png';
+			}
+			else if (aNumber == 4){
+				theImage = 'map_happy.png';
+			}
+			else if (aNumber == 5){
+				theImage = 'map_veryhappy.png';
+			}
+			
+			var imgFile = 'images/' + theImage;
+		
+			return imgFile;
+		}
+		
+		//functions for selecting correct mood marker TEXT for map
+		function getTitleForMap(aNumber){
+			var theTitle;
+			
+			if (aNumber == 1){
+				theTitle = 'You were unhappy here...';
+			}
+			else if (aNumber == 2){
+				theTitle = 'You were quite unhappy here...';
+			}
+			else if (aNumber == 3){
+				theTitle = 'This place makes you feel ok.';
+			}
+			else if (aNumber == 4){
+				theTitle = 'You like this place!';
+			}
+			else if (aNumber == 5){
+				theTitle = 'You really like this place!!!';
+			}
+		
+			return theTitle;
+		}
+		
+		function getAnimation(i){
+		if (i == 0){
+			return google.maps.Animation.BOUNCE;
+		}
+		else {
+		return google.maps.Animation.DROP;
+		}
+		
+		}
+		//initialises the map and defines parameters including styles
+		function initialize() {
+			var mapOptions = {
+				zoom: 10,
+				center: new google.maps.LatLng(53.385847,-6.064684),
+				disableDefaultUI: true
+			}
+			var map = new google.maps.Map(document.getElementById('map-canvas'),
+									mapOptions);
+			//setting the styles for the map to make it fit with design of app
+			map.set('styles', [
+			{
+				featureType: 'road',
+				elementType: 'geometry',
+				stylers: [
+				{ visibility: 'off' }
+				]
+			}, 
+			{
+				featureType: 'road',
+				elementType: 'labels',
+				stylers: [
+				{ visibility: 'off' }
+				]
+			},
+		
+			{
+				featureType: 'administrative.land_parcel',
+				elementType: 'labels',
+				stylers: [
+				{ visibility: 'off' }
+				]
+			},
+			{
+				featureType: 'administrative.locality',
+				elementType: 'labels',
+				stylers: [
+				{ visibility: 'off' }
+				]
+			},
+
+
+			{
+				featureType: 'transit',
+				elementType: 'geometry',
+				stylers: [
+				{ visibility: 'off' }
+				]
+			},
+		
+			{
+				featureType: 'transit',
+				elementType: 'labels',
+				stylers: [
+				{ visibility: 'off' }
+				]
+			},
+		
+				{
+				"featureType": "landscape",
+				"elementType": "all",
+				"stylers": [
+				{"saturation": -100},
+				{"lightness": 65},
+				{"visibility": "on"}
+				]
+			},
+			{
+				"featureType": "poi",
+				"elementType": "all",
+				"stylers": [
+					{"saturation": -100},
+					{"lightness": 51},
+					{"visibility": "simplified"}
+				]
+			},
+		
+			{
+				"featureType": "water",
+				"stylers": [
+					{"visibility": "on"},
+					{"lightness": -100}
+				]
+			}
+
+			]);
+			
+		
+			//looks up database to get mood at specific locations
+			var mapArray = dbGetMapDataWithMood(1, 1, 29);
+				var k = mapArray.length;
+				for (var i = 0; i < k; i++) {
+					var myLatLng = new google.maps.LatLng(mapArray[i][0], mapArray[i][1]);
+					
+						var marker = new google.maps.Marker({
+							position: myLatLng,
+							animation: getAnimation(i),
+							map: map,
+							icon: getImageForMap(mapArray[i][2]),
+							title: getTitleForMap(mapArray[i][2])
+						});
+				}			
+		}
+		
+		//gets users GPS location at the time of submit on a question (silent data)
+		function getGeolocationAtTimeOfQuestion(){
+				var locoList = [];
+				function success(pos){
+					var crd = pos.coords;
+					
+					locoList.push(crd.latitude);
+					locoList.push(crd.longitude);
+					
+					var pGeo = document.getElementById('locoList');
+					pGeo.innerHTML = "[" + locoList + "]";
+
+					foundLocation = true;
+				}
+				
+				function error(err){
+					alert(err.code + " " + err.message);
+					locoList = ["noData", "noData"];
+				
+				}
+		
+				navigator.geolocation.getCurrentPosition(success, error);
+		
+			}
+		
+		
+		
+		//======= FUNCTIONS FOR NAVIGATION AND DYNAMIC HTML PAGE GENERATION =======
+		
+		//open navigation using notify.js
+		function openNav(){
+			if ((navOpen == false) && (questionOpen == false)){
+				$('#filler').notify({},{
+					autoHide:false,
+					clickToHide:false,
+					style: 'navDropdown',
+					position: 'bottom right'
+				});
+				navOpen = true;
+			}
+			else if ((navOpen == true)   &&  (questionOpen == false)){
+				$('.notifyjs-navDropdown-base').trigger('notify-hide');
+				navOpen = false;
+			}
+		}
+		
+		//define, build and load RECENTLY display
+		function loadRecently(){
+			navOpen = false;
+			$('.notifyjs-navDropdown-base').trigger('notify-hide');
+			var container = document.getElementById("app_wrapper");
+		
+			while (container.firstChild) {
+					container.removeChild(container.firstChild);
+			}
+			
+			var infoDiv = document.createElement("div");
+			
+			infoDiv.setAttribute("class", "styleInfoDiv crazyFader");
+			infoDiv.innerHTML = "<div class='info-pic-container'>" +
+									"<img src='images/slider_doggy_happy.png'/>" +
+								"</div>" + 
+								"<div  class='info-msg-container'>" +
+									"This is your most recent data. You can customise what is shown here using the button below!" +
+								"</div>";
+								
+								
+			container.appendChild(infoDiv);
+			
+			var chartDiv = document.createElement("div");
+			
+			chartDiv.setAttribute("id", "chartDiv");
+			chartDiv.setAttribute("class", "styleChartDiv crazyFader");
+			container.appendChild(chartDiv);
+			
+			var buttonDiv = document.createElement("div");
+			buttonDiv.setAttribute("class", "customButton crazyFader");
+			buttonDiv.innerHTML = "<input id='recentlyCustomise' class='uiButton' type='button' value='Customise' onclick='loadSettings();'>";
+			container.appendChild(buttonDiv);
+			
+			
+			var primaryChart = dbGetPrimaryDiagramOfUserAsHighChart(1, 1);
+			$('#chartDiv').highcharts(primaryChart[3].diagram.highcharts);//JSON.parse(primaryChart[3]).diagram.highcharts);
+			$('#header_title').html('Recently');
+			$('#nav-button-recently').css('display', 'none');
+			$('#nav-button-insights').css('display', 'block');
+			$('#nav-button-settings').css('display', 'block');
+			
+		}
+		
+		//define, build and load INSIGHTS display
+		function loadInsights(chartNum){
+			navOpen = false;
+			$('.notifyjs-navDropdown-base').trigger('notify-hide');
+			var secondaryCharts = dbGetSecondaryDiagramsOfUser(1, 1);
+			var container = document.getElementById("app_wrapper");
+			
+			while (container.firstChild) {
+					container.removeChild(container.firstChild);
+			}
+			
+			var infoDiv = document.createElement("div");
+			
+			infoDiv.setAttribute("class", "styleInfoDiv crazyFader");
+			infoDiv.innerHTML = "<div class='info-pic-container'>" +
+									"<img src='images/slider_doggy_happy.png'/>" +
+								"</div>" + 
+								"<div id='chart-msg' class='info-msg-container'>" +
+									"Here are all your charts. Use the buttons below to navigate!" +
+								"</div>";
+								
+								
+			container.appendChild(infoDiv);
+			
+			for (i = 0; i < secondaryCharts.length; i++) { 
+				var id = "chartContainer"+i;
+				var chartContainer = document.createElement("div");
+				chartContainer.setAttribute("id",id);
+				chartContainer.setAttribute("class", "styleChartDiv crazyFader");
+				
+				container.appendChild(chartContainer);
+				$('#'+id).highcharts(secondaryCharts[i][3].diagram.highcharts);	
+			}
+			
+			var mapContainer = document.createElement("div");
+				mapContainer.setAttribute("id", "map-canvas");
+				mapContainer.setAttribute("class", "crazyFader");
+				container.appendChild(mapContainer);
+			
+			var buttonDiv = document.createElement("div");
+			buttonDiv.setAttribute("id", "insightsCustom");
+			buttonDiv.setAttribute("class", "customButton crazyFader");
+			buttonDiv.innerHTML = 	"<table>" +
+										"<tr>" +
+											"<td><input id='showMap' class='switchCharts uiButton' type='image' src='images/graph_icons/map.png'  onclick='changeInsightsCharts(4);'></td>" +
+											"<td><input id='showMood' class='switchCharts uiButton' type='image' src='images/graph_icons/pie.png'  onclick='changeInsightsCharts(1);'></td>" +
+											"<td><input id='showActivities' class='switchCharts uiButton' type='image' src='images/graph_icons/lines.png'  onclick='changeInsightsCharts(2);'></td>" +
+											"<td><input id='showConversations' class='switchCharts uiButton' type='image' src='images/graph_icons/bars.png'  onclick='changeInsightsCharts(3);'></td>" +
+											
+										"</tr>" +
+									"</table>";
+			container.appendChild(buttonDiv);
+				
+			
+
+				
+				
+				$('#header_title').html('Insights');
+				$('#nav-button-insights').css('display', 'none');
+				$('#nav-button-recently').css('display', 'block');
+				$('#nav-button-settings').css('display', 'block');
+		
+		
+		initialize();
+		changeInsightsCharts(chartNum);
+		}
+	
+		//======= FUNCTIONS FOR OPENING AND CUSTOMISING SETTINGS =======
+		
+		//define, build and load SETTINGS display
+		function loadSettings(){
+			
+		
+			navOpen = false;
+			$('.notifyjs-navDropdown-base').trigger('notify-hide');
+			var container = document.getElementById("app_wrapper");
+			
+			
+			while (container.firstChild) {
+					container.removeChild(container.firstChild);
+			}
+			
+			var settingsContainer = document.createElement("DIV");
+			settingsContainer.setAttribute("id","settings_container");
+			container.appendChild(settingsContainer);
+			
+			var settingsList = document.createElement("p");
+			settingsList.setAttribute("id","settings_list");
+			settingsList.setAttribute("class","crazyFader");
+			container.appendChild(settingsList);
+			
+			
+			var factorsChecklist = document.createTextNode("What factors would you currently like to track?");
+			settingsList.appendChild(factorsChecklist);
+			var checklistForm = document.createElement("FORM");
+			settingsList.appendChild(checklistForm);
+			var space = document.createElement("Br");
+			settingsList.appendChild(space);
+			
+			var mood = document.createTextNode("Mood");
+			settingsList.appendChild(mood);	
+			var moodChecklist = document.createElement("INPUT");
+			moodChecklist.setAttribute("type", "checkbox");
+			moodChecklist.setAttribute("value", "Mood");
+			moodChecklist.setAttribute("checked","checked");
+			moodChecklist.setAttribute("class", "settings_checklist");
+			settingsList.appendChild(moodChecklist);
+			var space1 = document.createElement("Br");
+			settingsList.appendChild(space1);
+			
+			var sleep = document.createTextNode("Sleep");
+			settingsList.appendChild(sleep);	
+			var sleepChecklist = document.createElement("INPUT");
+			sleepChecklist.setAttribute("type", "checkbox");
+			sleepChecklist.setAttribute("value", "Sleep");
+			sleepChecklist.setAttribute("checked","checked");
+			moodChecklist.setAttribute("class", "settings_checklist");
+			settingsList.appendChild(sleepChecklist);
+			var space2 = document.createElement("Br");
+			settingsList.appendChild(space2);
+			
+			var exercise = document.createTextNode("Exercise");
+			settingsList.appendChild(exercise);	
+			var exerciseChecklist = document.createElement("INPUT");
+			exerciseChecklist.setAttribute("type", "checkbox");
+			exerciseChecklist.setAttribute("value", "Exercise");
+			exerciseChecklist.setAttribute("checked","checked");
+			moodChecklist.setAttribute("class", "settings_checklist");
+			settingsList.appendChild(exerciseChecklist);
+			var space3 = document.createElement("Br");
+			settingsList.appendChild(space3);
+			
+			var reading = document.createTextNode("Reading");
+			settingsList.appendChild(reading);	
+			var readingChecklist = document.createElement("INPUT");
+			readingChecklist.setAttribute("type", "checkbox");
+			readingChecklist.setAttribute("value", "Reading");
+			readingChecklist.setAttribute("checked","checked");
+			moodChecklist.setAttribute("class", "settings_checklist");
+			settingsList.appendChild(readingChecklist);
+			var space4 = document.createElement("Br");
+			settingsList.appendChild(space4);
+			
+			var location = document.createTextNode("Location");
+			settingsList.appendChild(location);	
+			var locationChecklist = document.createElement("INPUT");
+			locationChecklist.setAttribute("type", "checkbox");
+			locationChecklist.setAttribute("value", "Location");
+			moodChecklist.setAttribute("class", "settings_checklist");
+			settingsList.appendChild(locationChecklist);
+			var space5 = document.createElement("Br");
+			settingsList.appendChild(space5);
+			var space6 = document.createElement("Br");
+			settingsList.appendChild(space6);
+			
+			
+			var settingsEdit = document.createElement("INPUT");
+			settingsEdit.setAttribute("type","button");
+			settingsEdit.setAttribute("value","Advanced settings");	
+			settingsEdit.setAttribute("id","advanced_settings");	
+			settingsEdit.setAttribute("class","settings_submit");
+			settingsList.appendChild(settingsEdit);
+			
+			var space7 = document.createElement("Br");
+			settingsList.appendChild(space7);
+			
+			var settingsSubmit = document.createElement("INPUT");
+			settingsSubmit.setAttribute("type","button");
+			settingsSubmit.setAttribute("id","confirm_settings1");
+			settingsSubmit.setAttribute("value","Confirm");
+			settingsSubmit.setAttribute("class","settings_submit")
+			settingsList.appendChild(settingsSubmit);
+			
+			$('#header_title').html('Settings');
+			$('#nav-button-insights').css('display', 'block');
+			$('#nav-button-recently').css('display', 'block');
+			$('#nav-button-settings').css('display', 'none');
+			
+			$('input[id="confirm_settings1"]').click(function(){
+				loadRecently();
+			});
+			
+	
+			$('input[id="advanced_settings"]').click(function(){
+				while (container.firstChild) {
+							container.removeChild(container.firstChild);
+					}
+				var settingsContainer = document.createElement("DIV");
+				settingsContainer.setAttribute("id","settings_container");
+				container.appendChild(settingsContainer);
+				
+				
+				var settingsList = document.createElement("p");
+				settingsList.setAttribute("id","settings_list");
+				settingsList.setAttribute("class","crazyFader");
+				container.appendChild(settingsList);
+				
+				
+				var settingsSleep = document.createTextNode("How many hours is a good night's sleep for you?");
+				settingsList.appendChild(settingsSleep);
+				var sleepForm = document.createElement("FORM");
+				settingsList.appendChild(sleepForm);
+				var sleepFormInput = document.createElement("INPUT");
+				sleepFormInput.setAttribute("type", "number");
+				sleepFormInput.setAttribute("min","0");
+				sleepFormInput.setAttribute("max","24");
+				sleepFormInput.setAttribute("value", goodsleepthreshold);
+				sleepFormInput.setAttribute("id","sleepFormInput");
+				sleepFormInput.setAttribute("class","settings_input");
+				sleepForm.appendChild(sleepFormInput);
+				
+				var settingsExercise = document.createTextNode("How many hours a day do you aim to exercise?");
+				settingsList.appendChild(settingsExercise);
+				var exerciseForm = document.createElement("FORM")
+				settingsList.appendChild(exerciseForm)
+				var exerciseFormInput = document.createElement("INPUT");
+				exerciseFormInput.setAttribute("type", "number");
+				exerciseFormInput.setAttribute("min","0");
+				exerciseFormInput.setAttribute("max","24");
+				exerciseFormInput.setAttribute("value", "0");
+				exerciseFormInput.setAttribute("id","exerciseFormInput")
+				exerciseFormInput.setAttribute("class","settings_input")
+				exerciseForm.appendChild(exerciseFormInput);
+				
+				
+				var settingsNew = document.createElement("INPUT");
+				settingsNew.setAttribute("type","button");
+				settingsNew.setAttribute("value","Add new factor");
+				settingsNew.setAttribute("class","settings_submit")
+				settingsList.appendChild(settingsNew);
+				
+				var space = document.createElement("Br");
+				settingsList.appendChild(space);
+				
+				var settingsSubmit = document.createElement("INPUT");
+				settingsSubmit.setAttribute("type","button");
+				settingsSubmit.setAttribute("value","Confirm");
+				settingsSubmit.setAttribute("id","confirm_settings2");
+				settingsSubmit.setAttribute("class","settings_submit")
+				settingsList.appendChild(settingsSubmit);
+			
+			
+			
+				$('#header_title').html('Settings');
+				$('#nav-button-insights').css('display', 'block');
+				$('#nav-button-recently').css('display', 'block');
+				$('#nav-button-settings').css('display', 'none');
+				
+				$('input[id="confirm_settings2"]').click(function(){
+				
+				
+				if (typeof(parseInt(document.getElementById("sleepFormInput").value))== 'number')
+				{
+					
+					goodsleepthreshold = document.getElementById("sleepFormInput").valueAsNumber;
+					loadRecently();
+				}
+				else{
+				alert("Please enter a number");
+				}
+			});
+				
+			
+			});	
+		}	
+		
+	
+	
+		//======= FUNCTIONS FOR DISPLAYING THE DIFFERENT INSIGHTS CHARTS AND INFO =======
+		
+		//handle switching between chart displays by number.
+		//modular functionality allwos for user defined charts, numbers and orders of this display
+		function changeInsightsCharts(theChartNumber){
+			if (theChartNumber == 1){
+				currentInsightsChartNum = 1;
+				$('#chartContainer0').css('display', 'block');
+				$('#chartContainer1').css('display', 'none');
+				$('#chartContainer2').css('display', 'none');
+				$('#map-canvas').css('display', 'none');
+				$('#chart-msg').html("Here is a chart of your mood lately. Hover over the chart to see the values!");
+				
+				if (!$('#showMood').addClass("currentChart")){
+				$('#showMood').addClass("currentChart");
+				}
+				if($('#showMap').hasClass("currentChart")){
+					$('#showMap').removeClass("currentChart");
+				}
+				if($('#showActivities').hasClass("currentChart")){
+					$('#showActivities').removeClass("currentChart");
+				}
+				if($('#showConversations').hasClass("currentChart")){
+					$('#showConversations').removeClass("currentChart");
+				}
+			
+			}
+			
+			else if (theChartNumber == 2){
+				currentInsightsChartNum = 2;
+				$('#chartContainer0').css('display', 'none');
+				$('#chartContainer1').css('display', 'block');
+				$('#chartContainer2').css('display', 'none');
+				$('#map-canvas').css('display', 'none');
+				$('#chart-msg').html("Here is a chart of your activities. You can customise what you see here in settings!");
+				
+				if (!$('#showActivities').addClass("currentChart")){
+				$('#showActivities').addClass("currentChart");
+				}
+				if($('#showMap').hasClass("currentChart")){
+					$('#showMap').removeClass("currentChart");
+				}
+				if($('#showMood').hasClass("currentChart")){
+					$('#showMood').removeClass("currentChart");
+				}
+				if($('#showConversations').hasClass("currentChart")){
+					$('#showConversations').removeClass("currentChart");
+				}
+			
+			}
+			
+			else if (theChartNumber == 3){
+				currentInsightsChartNum = 3;
+				$('#chartContainer0').css('display', 'none');
+				$('#chartContainer1').css('display', 'none');
+				$('#chartContainer2').css('display', 'block');
+				$('#map-canvas').css('display', 'none');
+				$('#chart-msg').html("These are your digital and face-to-face conversations for the last year.");
+				
+				if (!$('#showConversations').addClass("currentChart")){
+				$('#showConversations').addClass("currentChart");
+				}
+				if($('#showMap').hasClass("currentChart")){
+					$('#showMap').removeClass("currentChart");
+				}
+				if($('#showMood').hasClass("currentChart")){
+					$('#showMood').removeClass("currentChart");
+				}
+				if($('#showActivities').hasClass("currentChart")){
+					$('#showActivities').removeClass("currentChart");
+				}
+			
+			}
+			
+			else if (theChartNumber == 4){
+				currentInsightsChartNum = 4;
+				$('#chartContainer0').css('display', 'none');
+				$('#chartContainer1').css('display', 'none');
+				$('#chartContainer2').css('display', 'none');
+				$('#map-canvas').css('display', 'block');
+				$('#chart-msg').html("Here is your mood map! The faces represent your recorded mood in each location.");
+				
+				if (!$('#showMap').addClass("currentChart")){
+				$('#showMap').addClass("currentChart");
+				}
+				if($('#showConversations').hasClass("currentChart")){
+					$('#showConversations').removeClass("currentChart");
+				}
+				if($('#showMood').hasClass("currentChart")){
+					$('#showMood').removeClass("currentChart");
+				}
+				if($('#showActivities').hasClass("currentChart")){
+					$('#showActivities').removeClass("currentChart");
+				}	
+			}
+		}
+		
+		
+		//log user out using cookie and redirect to login page
+		function logout(){
+			$('.notifyjs-navDropdown-base').trigger('notify-hide');
+			document.cookie = "userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+			navOpen = false;
+			window.location = "login_template.html";
+		}
+		
+		
+		//these are background/side threads that handle the notification timing and are working separately to the main program
+		//SLEEPWORKER waits for a defined time and prompts user to enter SLEEP data
+		//MOODWORKER waits for a defined time and prompts user to enter MOOD data
+		function runNotificationWorkerThreads(){
+			//--------------- START: SLEEPWORKER --------------------
+			var sleepWorker = new Worker('js/TimerThread.js');
+			
+			sleepWorker.addEventListener('message', function(e) {
+				var form =	"<form>" +
+								"<input type='number' value='0' id='quantity' min='0' required><br>" +
+								"<input type='button'  id='submit_sleep' value='Submit' />" +
+							"</form>";
+							
+				var pic = "<div class='pic-container'>" +
+								"<img id='sliderImage' class='wellmut-pic' src='images/doggy_happy_small.png'/>" +
+							"</div>";
+							
+				$('#header_logo_left').notify({
+							question: 'How many hours did you sleep for last night?',
+							form: form,
+							pic: pic
+						},{				
+							autoHide:false,
+							clickToHide:false,
+							style: 'wellmutNotification',
+							arrowShow: false,
+						});
+						
+				questionOpen = true;
+				getGeolocationAtTimeOfQuestion();
+				
+				$(document).on('click', '.notifyjs-wellmutNotification-base #submit_sleep', function() {  
+				var value = {
+						  "name":"sleep",
+						  "type":"number",
+						  "value":$('#quantity').val()
+				  };
+				 
+				var t = [];
+				t = document.getElementById('locoList').innerHTML;
+				dbSetNewData(1, JSON.stringify(value), t);
+				setTimeout(function(){notifyTrends();},600);
+				questionOpen = false;
+				$(this).trigger('notify-hide');
+				if (document.getElementById('header_title').innerHTML == 'Recently'){
+							loadRecently();
+						
+						}
+						else if(document.getElementById('header_title').innerHTML == 'Insights'){
+							loadInsights(currentInsightsChartNum);
+						
+						}
+				});
+			}, false);
+			
+			var now = new Date(Date.now());
+			now.setSeconds(now.getSeconds() + 70);
+			var alertTime1 = now.getHours()*10000+now.getMinutes()*100+now.getSeconds();
+			
+			sleepWorker.postMessage({'alertTimes':[alertTime1]});
+			
+			//--------------- END: SLEEPWORKER --------------------
+			
+			//--------------- START: MOODWORKER --------------------
+			var moodWorker = new Worker('js/TimerThread.js');
+			
+			moodWorker.addEventListener('message', function(e) {
+				var form =	"<form>" +
+								"<input type='range' name='points' id='defaultSlider' value='4' min='1' max='5'><br>" +
+								"<p hidden class='note'>Current value: <span id='currentValue'>4</span></p>" +
+								"<input type='button'  id='submit_mood' value='Submit' />" +
+							"</form>" +
+							"<script>" +
+									"$('#sliderImage').attr('src', 'images/slider_doggy_neutral.png');" +
+								    "var currentValue = $('#currentValue');"+
+									"var sliderImage= $('#sliderIamge');"+
+								    "$('#defaultSlider').on('input',function(){"+
+								        "currentValue.html(this.value);"+
+										"if ($('#currentValue').text()==='5'){"+
+											"$('#sliderImage').attr('src', 'images/slider_doggy_veryhappy.png');}"+
+										"if ($('#currentValue').text()==='4'){"+
+											"$('#sliderImage').attr('src', 'images/slider_doggy_happy.png');}"+
+										"if ($('#currentValue').text()==='3'){"+
+											"$('#sliderImage').attr('src', 'images/slider_doggy_neutral.png');}"+
+										"if ($('#currentValue').text()==='2'){"+
+											"$('#sliderImage').attr('src', 'images/slider_doggy_sad.png');}"+
+										"if ($('#currentValue').text()==='1'){"+
+											"$('#sliderImage').attr('src', 'images/slider_doggy_verysad.png');}"+
+								   "});					"+	
+								   "$('#defaultSlider').change();"+
+							"<\/script>";
+				
+				var pic = "<div class='pic-container'>" +
+								"<img id='sliderImage' class='wellmut-pic' src='images/doggy_happy_small.png'/>" +
+							"</div>";
+							
+				$('#header_logo_left').notify({
+						question: 'How do you feel?',
+						form: form,
+						pic: pic
+					},{				
+						autoHide:false,
+						clickToHide:false,
+						style: 'wellmutNotification',
+						arrowShow: false,
+					});
+					
+				questionOpen = true;
+				getGeolocationAtTimeOfQuestion();
+
+				
+				$(document).on('click', '.notifyjs-wellmutNotification-base #submit_mood', function() {  
+						var value = {
+							  "name":"mood",
+							  "type":"number",
+							  "value":$('#currentValue').text()
+						};
+						
+							
+						var t = [];
+						t = document.getElementById('locoList').innerHTML;
+						dbSetNewData(1, JSON.stringify(value), t);
+						setTimeout(function(){notifyTrends();},600);
+
+						questionOpen = false;
+						$(this).trigger('notify-hide');
+						if (document.getElementById('header_title').innerHTML == 'Recently'){
+							loadRecently();
+						
+						}
+						else if(document.getElementById('header_title').innerHTML == 'Insights'){
+							loadInsights(currentInsightsChartNum);
+						
+						}	
+					});
+				}, false);
+			
+			var now = new Date(Date.now());
+			now.setSeconds(now.getSeconds() + 20);
+			var alertTime1 = now.getHours()*10000+now.getMinutes()*100+now.getSeconds();
+			now.setSeconds(now.getSeconds() + 100);
+			var alertTime2 = now.getHours()*10000+now.getMinutes()*100+now.getSeconds();
+			
+			moodWorker.postMessage({'alertTimes':[alertTime1, alertTime2]});
+			//--------------- END: MOODWORKER --------------------
+			
+		}
+
+		
+		//------------------------- START: Cookie functions ------------------------
+		//cookies handle log in and out
+		function getCookie(cname) {
+		    var name = cname + "=";
+		    var ca = document.cookie.split(';');
+		    for(var i=0; i<ca.length; i++) {
+				var c = ca[i];
+		        while (c.charAt(0)==' ') c = c.substring(1);
+		        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+		    }
+		    return "";
+		}
+		//------------------------- END: Cookie functions ------------------------		
+		
+		
+		//========================= END: FUNCTIONS AND GLOBAL VARIABLES ===================
+		
+		//========================= START: MAIN THREAD ====================================
+		
+		//if a user tries to get to this page without a set cookie, redirect to login because they aren't registered yet
+		if(getCookie("userid")!=""){
+			loadRecently();
+			runNotificationWorkerThreads();
+			
+		}else{
+			window.location = "login_template.html";
+		}
+		
+		//========================= END: MAIN THREAD ====================================
+	</script>
+	
+	
+	
+</body>
+</html>

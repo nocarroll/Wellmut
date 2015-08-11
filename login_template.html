@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,height=device-height,initial-scale=0.77, user-scalable=no, width=320"/>
+	<link rel="icon" type="image/png" href="images/favicon.png" />
+	<link rel="stylesheet" href="css/style.css"/>
+	<script type="text/javascript" src="js/DBAccess.js"></script>
+	<title>Wellmut | Login</title>
+</head>
+
+
+<body>
+
+	<header id="app_header">
+		<div id="logo_banner">
+			<img src="images/ic_header_wellmut.png"  id="header_logo_left" width="36" height="36" alt="The logo for the app">
+			<div class="vertDrop" id="header_logo_right_container">
+				<img class="vertDrop" id="filler" src="images/empty.png" width="30" height="30" alt="The logo for the app">
+			</div>
+			<h1>Login</h1>	
+		</div>
+	</header>
+	
+	<div id="false_wrapper">
+		<div id="app_wrapper" class="crazyFader">
+			<img src="images/textlogo.png" class="body_logo" width="590" height="147" alt="The logo for the app">
+			<div id="login_form">
+				<form action="#" autocomplete=on>
+				
+				Email:<br/>
+				<input id="email_input" class="form_text" type="email" size="25" autofocus required onkeydown="if (event.keyCode == 13) document.getElementById('login').click()"/><br/>
+				<br/>
+				Password:<br/>
+				<input id="password_input" class="form_text" type="password" size="25" required onkeydown="if (event.keyCode == 13) document.getElementById('login').click()"/><br/>
+				
+				<input id="login" type="button" value="Login" name="login" onclick="validateUser()">
+				</form>
+			</div>	
+		</div>
+		
+	</div>
+
+	<script>
+	
+	//set a cookie for successful login
+	function setCookie(cname, cvalue, exdays) {
+		var d = new Date();
+	    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+	    var expires = "expires="+d.toUTCString();
+	    document.cookie = cname + "=" + cvalue; + "; " + expires;// + "; path=/";
+	}
+	
+	//when user tries to log in, check user details against database
+	function validateUser()
+		{
+			var loginEmail = document.getElementById("email_input").value;
+			var loginPassword = document.getElementById("password_input").value;
+			
+			var valid = dbValidateUser(loginEmail, loginPassword);
+			
+			if (valid != false )
+				{
+					setCookie("userid", "1", 1);
+					window.location = "container.html";	
+				}
+				
+			else
+				{
+					alert("Please enter a valid username and password!");
+				}
+		}
+	
+	</script>
+	
+	
+	
+</body>
+</html>
